@@ -7,6 +7,7 @@ import random
 import urllib
 import urllib2
 import sys
+import re
 
 # for sending images
 from PIL import Image
@@ -100,6 +101,7 @@ class WebhookHandler(webapp2.RequestHandler):
                         'text': msg.encode('utf-8'),
                         'disable_web_page_preview': 'true',
                         'reply_to_message_id': str(message_id),
+                        'parse_mode': 'markdown'
                     })).read()
                 else:
                     resp = urllib2.urlopen(BASE_URL + 'sendMessage', urllib.urlencode({
@@ -156,6 +158,13 @@ class WebhookHandler(webapp2.RequestHandler):
 
         elif 'what time' in text:
             reply('look at the corner of your screen!')
+        elif text.startswith('s/'):
+            try:
+                split = text.split('/')
+                message_id = message.get('reply_to_message')['message_id']
+                reply('*Você quis dizer:*\n' + re.sub(split[1], split[2], message.get('reply_to_message')['text']))
+            except Exception, e:
+                reply('deu merda:\n' + str(e))
 
 
 app = webapp2.WSGIApplication([
