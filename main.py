@@ -1,9 +1,12 @@
+# -*- coding: utf-8 -*-
+# encoding=utf8
 import StringIO
 import json
 import logging
 import random
 import urllib
 import urllib2
+import sys
 
 # for sending images
 from PIL import Image
@@ -14,7 +17,10 @@ from google.appengine.api import urlfetch
 from google.appengine.ext import ndb
 import webapp2
 
-TOKEN = 'YOUR_BOT_TOKEN_HERE'
+reload(sys)
+sys.setdefaultencoding('utf8')
+
+TOKEN = 'MYTOKEN'
 
 BASE_URL = 'https://api.telegram.org/bot' + TOKEN + '/'
 
@@ -88,12 +94,19 @@ class WebhookHandler(webapp2.RequestHandler):
 
         def reply(msg=None, img=None):
             if msg:
-                resp = urllib2.urlopen(BASE_URL + 'sendMessage', urllib.urlencode({
-                    'chat_id': str(chat_id),
-                    'text': msg.encode('utf-8'),
-                    'disable_web_page_preview': 'true',
-                    'reply_to_message_id': str(message_id),
-                })).read()
+                if(message_id != -1):
+                    resp = urllib2.urlopen(BASE_URL + 'sendMessage', urllib.urlencode({
+                        'chat_id': str(chat_id),
+                        'text': msg.encode('utf-8'),
+                        'disable_web_page_preview': 'true',
+                        'reply_to_message_id': str(message_id),
+                    })).read()
+                else:
+                    resp = urllib2.urlopen(BASE_URL + 'sendMessage', urllib.urlencode({
+                        'chat_id': str(chat_id),
+                        'text': msg.encode('utf-8'),
+                        'disable_web_page_preview': 'true',
+                    })).read()
             elif img:
                 resp = multipart.post_multipart(BASE_URL + 'sendPhoto', [
                     ('chat_id', str(chat_id)),
@@ -123,20 +136,26 @@ class WebhookHandler(webapp2.RequestHandler):
                 output = StringIO.StringIO()
                 img.save(output, 'JPEG')
                 reply(img=output.getvalue())
-            else:
-                reply('What command?')
+            elif text.startswith('/away'):
+                message_id = -1
+                try:
+                    reply(str(message.get('reply_to_message').get('from')['first_name']) + ' se ausentou, retorne mais tarde\nMotivo: ' + text.replace('/away','').replace('@AnabothQueEhBOT',''))
+                except:
+                    reply(str(fr['first_name']) + ' se ausentou, retorne mais tarde\nMotivo: ' + text.replace('/away','').replace('@AnabothQueEhBOT',''))
+            elif text.startswith('/back'):
+                message_id = -1
+                try:
+                    reply(str(message.get('reply_to_message').get('from')['first_name']) + ' está de volta, já podem encher o saco dele\n#CMBotLixo')
+                except:
+                    reply(str(fr['first_name']) + ' está de volta, já podem encher o saco dele\n#CMBotLixo')
+            elif text == '/debug':
+                if(fr['username'] == 'anaboth'):
+                    reply(str(message))
+                else:
+                    reply('Unauthorized')
 
-        # CUSTOMIZE FROM HERE
-
-        elif 'who are you' in text:
-            reply('telebot starter kit, created by yukuku: https://github.com/yukuku/telebot')
         elif 'what time' in text:
             reply('look at the corner of your screen!')
-        else:
-            if getEnabled(chat_id):
-                reply('I got your message! (but I do not know how to answer)')
-            else:
-                logging.info('not enabled for chat_id {}'.format(chat_id))
 
 
 app = webapp2.WSGIApplication([
