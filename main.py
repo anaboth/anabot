@@ -101,7 +101,7 @@ class WebhookHandler(webapp2.RequestHandler):
                         'text': msg.encode('utf-8'),
                         'disable_web_page_preview': 'true',
                         'reply_to_message_id': str(message_id),
-                        'parse_mode': 'markdown'
+                        'parse_mode': 'markdown',
                     })).read()
                 else:
                     resp = urllib2.urlopen(BASE_URL + 'sendMessage', urllib.urlencode({
@@ -152,7 +152,14 @@ class WebhookHandler(webapp2.RequestHandler):
                     reply(str(fr['first_name']) + ' está de volta, já podem encher o saco dele\n#CMBotLixo')
             elif text == '/debug':
                 if(fr['username'] == 'anaboth'):
-                    reply(str(message))
+                    resp = urllib2.urlopen(BASE_URL + 'sendMessage', urllib.urlencode({
+                        'chat_id': str(chat_id),
+                        'text': str(message).encode('utf-8'),
+                        'disable_web_page_preview': 'true',
+                        'reply_to_message_id': str(message_id),
+                    })).read()
+                    logging.info('send response:')
+                    logging.info(resp)
                 else:
                     reply('Unauthorized')
 
