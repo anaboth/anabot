@@ -201,7 +201,7 @@ class WebhookHandler(webapp2.RequestHandler):
             try:
                 split = text.split('/')
                 message_id = message.get('reply_to_message')['message_id']
-                reply('*Você quis dizer:*\n' + re.sub(split[1], split[2], message.get('reply_to_message')['text']).replace('Você quis dizer:',''))
+                reply('*Você quis dizer:*\n' + re.sub(split[1], split[2], message.get('reply_to_message')['text'].replace('Você quis dizer:\n','')))
             except Exception, e:
                 reply('deu merda:\n' + str(e))
 
