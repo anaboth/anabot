@@ -81,7 +81,7 @@ class WebhookHandler(webapp2.RequestHandler):
         try:
             message = body['message']
         except:
-            message = body['edited_message']
+            return
         message_id = message.get('message_id')
         date = message.get('date')
         text = message.get('text')
@@ -130,14 +130,46 @@ class WebhookHandler(webapp2.RequestHandler):
             elif text == '/stop':
                 reply('Bot disabled')
                 setEnabled(chat_id, False)
-            elif text == '/image':
-                img = Image.new('RGB', (512, 512))
-                base = random.randint(0, 16777216)
-                pixels = [base+i*j for i in range(512) for j in range(512)]  # generate sample image
-                img.putdata(pixels)
-                output = StringIO.StringIO()
-                img.save(output, 'JPEG')
-                reply(img=output.getvalue())
+            elif text.startswith('/mega'):
+            	a = []
+                for i in range(0,6):
+                    while(True):
+                        temp = random.randint(1,60)
+                        if temp in a:
+                            continue
+                        a.append(temp)
+                        break
+            	reply(str(sorted(a)))
+            elif text.startswith('/quina'):
+                a = []
+                for i in range(0,5):
+                    while(True):
+                        temp = random.randint(1,80)
+                        if temp in a:
+                            continue
+                        a.append(temp)
+                        break
+                reply(str(sorted(a)))
+            elif text.startswith('/dupla'):
+                a = []
+                for i in range(0,6):
+                    while(True):
+                        temp = random.randint(1,50)
+                        if temp in a:
+                            continue
+                        a.append(temp)
+                        break
+                reply(str(sorted(a)))
+            elif text.startswith('/loto'):
+                a = []
+                for i in range(0,15):
+                    while(True):
+                        temp = random.randint(1,25)
+                        if temp in a:
+                            continue
+                        a.append(temp)
+                        break
+                reply(str(sorted(a)))
             elif text.startswith('/away'):
                 message_id = -1
                 try:
@@ -151,7 +183,7 @@ class WebhookHandler(webapp2.RequestHandler):
                 except:
                     reply(str(fr['first_name']) + ' está de volta, já podem encher o saco dele\n#CMBotLixo')
             elif text == '/debug':
-                if(fr['username'] == 'anaboth'):
+                if(fr['username'] == 'Anaboth'):
                     resp = urllib2.urlopen(BASE_URL + 'sendMessage', urllib.urlencode({
                         'chat_id': str(chat_id),
                         'text': str(message).encode('utf-8'),
@@ -169,7 +201,7 @@ class WebhookHandler(webapp2.RequestHandler):
             try:
                 split = text.split('/')
                 message_id = message.get('reply_to_message')['message_id']
-                reply('*Você quis dizer:*\n' + re.sub(split[1], split[2], message.get('reply_to_message')['text']))
+                reply('*Você quis dizer:*\n' + re.sub(split[1], split[2], message.get('reply_to_message')['text']).replace('Você quis dizer:',''))
             except Exception, e:
                 reply('deu merda:\n' + str(e))
 
