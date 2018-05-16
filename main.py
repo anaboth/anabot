@@ -131,7 +131,7 @@ class WebhookHandler(webapp2.RequestHandler):
                 reply('Bot disabled')
                 setEnabled(chat_id, False)
             elif text.startswith('/mega'):
-            	a = []
+                a = []
                 for i in range(0,6):
                     while(True):
                         temp = random.randint(1,60)
@@ -139,7 +139,7 @@ class WebhookHandler(webapp2.RequestHandler):
                             continue
                         a.append(temp)
                         break
-            	reply(str(sorted(a)))
+                reply(str(sorted(a)))
             elif text.startswith('/quina'):
                 a = []
                 for i in range(0,5):
@@ -202,11 +202,9 @@ class WebhookHandler(webapp2.RequestHandler):
                 split = text.split('/')
                 message_id = message.get('reply_to_message')['message_id']
                 reply('*Você quis dizer:*\n' + re.sub(split[1], split[2], message.get('reply_to_message')['text'].replace('Você quis dizer:\n','')))
-            except Exception, e:
-                if str(e) == "'NoneType' object has no attribute 'getitem'":
-                    reply('_No Message Replied_')
-                else:
-                    reply('deu merda:\n_' + str(e) + '_')
+            except:
+                if not message.get('reply_to_message'):
+                    reply('No message replied')
 
 
 app = webapp2.WSGIApplication([
